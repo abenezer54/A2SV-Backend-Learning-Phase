@@ -7,13 +7,22 @@ import (
 	"strings"
 )
 
-func getInteger(reader *bufio.Reader) (int, error) {
+func getLine(reader *bufio.Reader) (string, error) {
 	line, err := reader.ReadString('\n')
+	line = strings.TrimSpace(line)
+	if err != nil {
+		return "", err
+	}
+	if len(line) == 0 {
+		return "", errors.New("please enter a value")
+	}
+	return "", nil
+}
+
+func getInteger(reader *bufio.Reader) (int, error) {
+	line, err := getLine(reader)
 	if err != nil {
 		return 0, err
-	}
-	if line == "" {
-		return 0, errors.New("please enter a value")
 	}
 
 	line = strings.TrimSpace(line)
@@ -25,14 +34,12 @@ func getInteger(reader *bufio.Reader) (int, error) {
 	return number, nil
 }
 
-func getFloor(reader *bufio.Reader) (float64, error) {
-	line, err := reader.ReadString('\n')
+func getFloat(reader *bufio.Reader) (float64, error) {
+	line, err := getLine(reader)
 	if err != nil {
 		return 0.0, err
 	}
-	if line == "" {
-		return 0, errors.New("please enter a value")
-	}
+
 	line = strings.TrimSpace(line)
 	number, err := strconv.ParseFloat(line, 64)
 	if err != nil {

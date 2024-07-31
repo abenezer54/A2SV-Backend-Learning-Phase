@@ -21,7 +21,7 @@ func main() {
 		fmt.Println("Welcome to grade calculator")
 		fmt.Println("------------------------------------------")
 		fmt.Println("Enter your name: ")
-		name, err := reader.ReadString('\n')
+		name, err := getLine(reader)
 		if err != nil {
 			fmt.Println("ERROR!!!: ", err)
 			continue
@@ -47,7 +47,7 @@ func main() {
 			}
 
 			fmt.Printf("Enter the grade of %v subject: \n", idx)
-			sub.grade, err = getFloor(reader)
+			sub.grade, err = getFloat(reader)
 			if err != nil {
 				fmt.Println("ERROR!!!: ", err)
 				continue
@@ -55,7 +55,7 @@ func main() {
 			msg, ok := validateGrade(sub.grade)
 			for !ok {
 				fmt.Println(msg, "||Enter a valid grade")
-				sub.grade, err = getFloor(reader)
+				sub.grade, err = getFloat(reader)
 				if err != nil {
 					fmt.Println("ERROR!!!: ", err)
 					continue
