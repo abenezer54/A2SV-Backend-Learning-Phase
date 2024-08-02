@@ -1,0 +1,37 @@
+{
+	{
+		ID:          "1",
+		Title:       "Complete Golang Assignment",
+		Description: "Finish the coding assignment for the Go course.",
+		DueDate:     time.Now().AddDate(0, 0, 7), // Due in 7 days
+		Status:      "Pending",
+	},
+	{
+		ID:          "2",
+		Title:       "Project Meeting",
+		Description: "Attend the project kickoff meeting with the team.",
+		DueDate:     time.Now().AddDate(0, 0, 1), // Due in 1 day
+		Status:      "Scheduled",
+	},
+	{
+		ID:          "3",
+		Title:       "Code Review",
+		Description: "Review the pull requests submitted by team members.",
+		DueDate:     time.Now().AddDate(0, 0, 3), // Due in 3 days
+		Status:      "In Progress",
+	},
+	{
+		ID:          "4",
+		Title:       "Update Documentation",
+		Description: "Update the project's README and other documentation files.",
+		DueDate:     time.Now().AddDate(0, 0, 5), // Due in 5 days
+		Status:      "Pending",
+	},
+	{
+		ID:          "5",
+		Title:       "Deploy Application",
+		Description: "Deploy the latest version of the application to the production server.",
+		DueDate:     time.Now().AddDate(0, 0, 2), // Due in 2 days
+		Status:      "Completed",
+	},
+}
