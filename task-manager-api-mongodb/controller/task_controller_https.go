@@ -31,7 +31,7 @@ func (rh *RouteHandler) CreateTask(c *gin.Context) {
 		c.JSON(http.StatusConflict, gin.H{"error": err.Error()})
 		return
 	}
-	c.JSON(http.StatusOK, task)
+	c.JSON(http.StatusCreated, task)
 }
 
 func (rh *RouteHandler) GetTaskByID(c *gin.Context) {
@@ -67,7 +67,7 @@ func (rh *RouteHandler) UpdateTask(c *gin.Context) {
 		return
 	}
 
-	task.ID = objectID 
+	task.ID = objectID
 	if err := rh.TaskService.UpdateTask(&task); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
