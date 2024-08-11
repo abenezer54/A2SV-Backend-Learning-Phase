@@ -1,0 +1,1 @@
+This file is created to check connecion of github and local git.
