@@ -4,7 +4,6 @@ import (
 	"net/http"
 	"time"
 
-	"task-manager-api/domains"
 	"task-manager-api/infrastructure"
 	"task-manager-api/usecases"
 
@@ -77,7 +76,6 @@ func (tc *TaskController) GetTaskByCreatorID(c *gin.Context) {
 	c.JSON(http.StatusOK, task)
 }
 
-// Admins EndPoint
 func (tc *TaskController) GetAllTasks(c *gin.Context) {
 	userClaims := c.MustGet("userClaims").(*infrastructure.Claims)
 	creatorID, err := primitive.ObjectIDFromHex(userClaims.UserID)
@@ -135,30 +133,6 @@ func (tc *TaskController) UpdateTaskByCreatorID(c *gin.Context) {
 	c.JSON(http.StatusOK, task)
 }
 
-// Admin
-func (rh *TaskController) UpdateTask(c *gin.Context) {
-	taskID := c.Param("id")
-	var task domains.Task
-	if err := c.ShouldBindJSON(&task); err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
-		return
-	}
-
-	objectID, err := primitive.ObjectIDFromHex(taskID)
-	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "invalid task ID"})
-		return
-	}
-
-	task.ID = objectID
-	if err := rh.taskUsecase.UpdateTask(&task); err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
-		return
-	}
-
-	c.JSON(http.StatusOK, task)
-}
-
 func (tc *TaskController) DeleteTaskByCreatorID(c *gin.Context) {
 	taskID := c.Param("id")
 	taskObjID, err := primitive.ObjectIDFromHex(taskID)
@@ -185,13 +159,4 @@ func (tc *TaskController) DeleteTaskByCreatorID(c *gin.Context) {
 	}
 
 	c.JSON(http.StatusOK, gin.H{"message": "Task deleted successfully"})
-}
-
-func (rh *TaskController) DeleteTask(c *gin.Context) {
-	taskID := c.Param("id")
-	if err := rh.taskUsecase.DeleteTask(taskID); err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
-		return
-	}
-	c.JSON(http.StatusOK, gin.H{})
 }
