@@ -9,22 +9,22 @@ import (
 	"go.mongodb.org/mongo-driver/mongo"
 )
 
-type UserRepository struct {
+type UserRepositoryMongo struct {
 	collection *mongo.Collection
 }
 
-func NewUserRepository(collection *mongo.Collection) *UserRepository {
-	return &UserRepository{
+func NewUserRepositoryMongo(collection *mongo.Collection) *UserRepositoryMongo {
+	return &UserRepositoryMongo{
 		collection: collection,
 	}
 }
 
-func (r *UserRepository) CreateUser(ctx context.Context, user *domains.User) error {
+func (r *UserRepositoryMongo) CreateUser(ctx context.Context, user *domains.User) error {
 	_, err := r.collection.InsertOne(ctx, user)
 	return err
 }
 
-func (r *UserRepository) FindUserByUsername(ctx context.Context, username string) (*domains.User, error) {
+func (r *UserRepositoryMongo) FindUserByUsername(ctx context.Context, username string) (*domains.User, error) {
 	var user domains.User
 	err := r.collection.FindOne(ctx, bson.M{"username": username}).Decode(&user)
 	if err != nil {
@@ -36,7 +36,7 @@ func (r *UserRepository) FindUserByUsername(ctx context.Context, username string
 	return &user, nil
 }
 
-func (r *UserRepository) UserExists(ctx context.Context, username string) (bool, error) {
+func (r *UserRepositoryMongo) UserExists(ctx context.Context, username string) (bool, error) {
 	count, err := r.collection.CountDocuments(ctx, bson.M{"username": username})
 	if err != nil {
 		return false, err

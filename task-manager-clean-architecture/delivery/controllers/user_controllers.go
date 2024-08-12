@@ -10,12 +10,12 @@ import (
 )
 
 type UserController struct {
-	userService *usecases.UserService
+	userUsecase *usecases.UserUsecase
 }
 
-func NewUserController(userService *usecases.UserService) *UserController {
+func NewUserController(userUsecase *usecases.UserUsecase) *UserController {
 	return &UserController{
-		userService: userService,
+		userUsecase: userUsecase,
 	}
 }
 
@@ -31,7 +31,7 @@ func (uc *UserController) Register(c *gin.Context) {
 		return
 	}
 
-	user, err := uc.userService.RegisterUser(c.Request.Context(), req.Username, req.Password, req.Role)
+	user, err := uc.userUsecase.RegisterUser(c.Request.Context(), req.Username, req.Password, req.Role)
 	if err != nil {
 		if err.Error() == "username already exists" {
 			c.JSON(http.StatusConflict, gin.H{"error": "Username already exists"})
@@ -55,7 +55,7 @@ func (uc *UserController) Login(c *gin.Context) {
 		return
 	}
 
-	user, authenticated := uc.userService.AuthenticateUser(c.Request.Context(), req.Username, req.Password)
+	user, authenticated := uc.userUsecase.AuthenticateUser(c.Request.Context(), req.Username, req.Password)
 	if !authenticated {
 		c.JSON(http.StatusUnauthorized, gin.H{"error": "invalid username or password"})
 		return

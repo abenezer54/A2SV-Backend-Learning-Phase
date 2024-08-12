@@ -14,12 +14,12 @@ import (
 )
 
 type TaskController struct {
-	TaskService *usecases.TaskService
+	taskUsecase *usecases.TaskUsecase
 }
 
-func NewTaskController(taskService *usecases.TaskService) *TaskController {
+func NewTaskController(taskUsecase *usecases.TaskUsecase) *TaskController {
 	return &TaskController{
-		TaskService: taskService,
+		taskUsecase: taskUsecase,
 	}
 }
 
@@ -39,7 +39,7 @@ func (tc *TaskController) CreateTask(c *gin.Context) {
 	userClaims := c.MustGet("userClaims").(*infrastructure.Claims)
 	creatorID, _ := primitive.ObjectIDFromHex(userClaims.UserID)
 
-	task, err := tc.TaskService.CreateTask(c.Request.Context(), req.Title, req.Description, req.DueDate, creatorID)
+	task, err := tc.taskUsecase.CreateTask(c.Request.Context(), req.Title, req.Description, req.DueDate, creatorID)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
@@ -63,7 +63,7 @@ func (tc *TaskController) GetTaskByCreatorID(c *gin.Context) {
 		return
 	}
 
-	task, err := tc.TaskService.GetTaskByIDAndCreator(c.Request.Context(), taskObjID, creatorID)
+	task, err := tc.taskUsecase.GetTaskByIDAndCreator(c.Request.Context(), taskObjID, creatorID)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
@@ -86,7 +86,7 @@ func (tc *TaskController) GetAllTasks(c *gin.Context) {
 		return
 	}
 
-	tasks, err := tc.TaskService.GetTasksByCreator(c.Request.Context(), creatorID)
+	tasks, err := tc.taskUsecase.GetTasksByCreator(c.Request.Context(), creatorID)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
@@ -122,7 +122,7 @@ func (tc *TaskController) UpdateTaskByCreatorID(c *gin.Context) {
 		return
 	}
 
-	task, err := tc.TaskService.UpdateTaskByCreatorID(c.Request.Context(), taskObjID, creatorID, req.Title, req.Description, req.Completed, req.DueDate)
+	task, err := tc.taskUsecase.UpdateTaskByCreatorID(c.Request.Context(), taskObjID, creatorID, req.Title, req.Description, req.Completed, req.DueDate)
 	if err != nil {
 		if err == mongo.ErrNoDocuments {
 			c.JSON(http.StatusNotFound, gin.H{"error": "Task not found"})
@@ -151,7 +151,7 @@ func (rh *TaskController) UpdateTask(c *gin.Context) {
 	}
 
 	task.ID = objectID
-	if err := rh.TaskService.UpdateTask(&task); err != nil {
+	if err := rh.taskUsecase.UpdateTask(&task); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
@@ -174,7 +174,7 @@ func (tc *TaskController) DeleteTaskByCreatorID(c *gin.Context) {
 		return
 	}
 
-	err = tc.TaskService.DeleteTaskByCreatorID(c.Request.Context(), taskObjID, creatorID)
+	err = tc.taskUsecase.DeleteTaskByCreatorID(c.Request.Context(), taskObjID, creatorID)
 	if err != nil {
 		if err == mongo.ErrNoDocuments {
 			c.JSON(http.StatusNotFound, gin.H{"error": "Task not found"})
@@ -189,7 +189,7 @@ func (tc *TaskController) DeleteTaskByCreatorID(c *gin.Context) {
 
 func (rh *TaskController) DeleteTask(c *gin.Context) {
 	taskID := c.Param("id")
-	if err := rh.TaskService.DeleteTask(taskID); err != nil {
+	if err := rh.taskUsecase.DeleteTask(taskID); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}

@@ -15,7 +15,7 @@ type TaskRepoMongo struct {
 	collection *mongo.Collection
 }
 
-func NewTaskRepository(collection *mongo.Collection) *TaskRepoMongo {
+func NewTaskRepositoryMongo(collection *mongo.Collection) *TaskRepoMongo {
 	return &TaskRepoMongo{
 		collection: collection,
 	}
