@@ -20,11 +20,11 @@ func main() {
 	taskCollection := dbClient.Database("task-manager").Collection("tasks")
 	userCollection := dbClient.Database("task-manager").Collection("users")
 
-	taskRepo := repositories.NewTaskRepository(taskCollection)
-	userRepo := repositories.NewUserRepository(userCollection)
+	taskRepo := repositories.NewTaskRepositoryMongo(taskCollection)
+	userRepo := repositories.NewUserRepositoryMongo(userCollection)
 
-	taskService := usecases.NewTaskService(taskRepo)
-	userService := usecases.NewUserService(userRepo)
+	taskService := usecases.NewTaskUsecase(taskRepo)
+	userService := usecases.NewUserUsecase(userRepo)
 
 	taskController := controllers.NewTaskController(taskService)
 	userController := controllers.NewUserController(userService)

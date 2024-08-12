@@ -5,20 +5,19 @@ import (
 	"errors"
 
 	"task-manager-api/domains"
-	"task-manager-api/repositories"
 )
 
-type UserService struct {
-	userRepository *repositories.UserRepository
+type UserUsecase struct {
+	userRepository domains.UserRepository
 }
 
-func NewUserService(userRepo *repositories.UserRepository) *UserService {
-	return &UserService{
+func NewUserUsecase(userRepo domains.UserRepository) *UserUsecase {
+	return &UserUsecase{
 		userRepository: userRepo,
 	}
 }
 
-func (s *UserService) RegisterUser(ctx context.Context, username, password, role string) (*domains.User, error) {
+func (s *UserUsecase) RegisterUser(ctx context.Context, username, password, role string) (*domains.User, error) {
 	// Check if the username already exists
 	exists, err := s.userRepository.UserExists(ctx, username)
 	if err != nil {
@@ -43,7 +42,7 @@ func (s *UserService) RegisterUser(ctx context.Context, username, password, role
 	return user, nil
 }
 
-func (s *UserService) AuthenticateUser(ctx context.Context, username, password string) (*domains.User, bool) {
+func (s *UserUsecase) AuthenticateUser(ctx context.Context, username, password string) (*domains.User, bool) {
 	user, err := s.userRepository.FindUserByUsername(ctx, username)
 	if err != nil || user == nil {
 		return nil, false

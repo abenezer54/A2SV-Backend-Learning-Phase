@@ -1,7 +1,9 @@
 package domains
 
 import (
+	"context"
 	"time"
+
 	"go.mongodb.org/mongo-driver/bson/primitive"
 )
 
@@ -23,4 +25,16 @@ func NewTask(title, description string, completed bool, dueDate time.Time, creat
 		DueDate:     dueDate,
 		CreatorID:   creatorId,
 	}
+}
+
+type TaskRepository interface {
+	CreateTask(ctx context.Context, task *Task) (*Task, error)
+	FindTasksByCreator(ctx context.Context, creatorID primitive.ObjectID) ([]*Task, error)
+	FindTaskByIDAndCreator(ctx context.Context, taskID, creatorID primitive.ObjectID) (*Task, error)
+	GetTaskByID(id string) (*Task, error)
+	GetAllTasks() ([]*Task, error)
+	UpdateTaskByCreatorID(ctx context.Context, task *Task) error
+	UpdateTask(task *Task) error
+	DeleteTaskByCreatorID(ctx context.Context, taskID, creatorID primitive.ObjectID) error
+	DeleteTask(id string) error
 }

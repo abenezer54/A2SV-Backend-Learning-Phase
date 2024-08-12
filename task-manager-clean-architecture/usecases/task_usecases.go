@@ -6,23 +6,22 @@ import (
 	"time"
 
 	"task-manager-api/domains"
-	"task-manager-api/repositories"
 
 	"go.mongodb.org/mongo-driver/bson/primitive"
 	"go.mongodb.org/mongo-driver/mongo"
 )
 
-type TaskService struct {
-	repo *repositories.TaskRepoMongo
+type TaskUsecase struct {
+	repo domains.TaskRepository
 }
 
-func NewTaskService(repo *repositories.TaskRepoMongo) *TaskService {
-	return &TaskService{
+func NewTaskUsecase(repo domains.TaskRepository) *TaskUsecase {
+	return &TaskUsecase{
 		repo: repo,
 	}
 }
 
-func (ts *TaskService) CreateTask(ctx context.Context, title, description string, dueDate time.Time, creatorID primitive.ObjectID) (*domains.Task, error) {
+func (ts *TaskUsecase) CreateTask(ctx context.Context, title, description string, dueDate time.Time, creatorID primitive.ObjectID) (*domains.Task, error) {
 	task := &domains.Task{
 		Title:       title,
 		Description: description,
@@ -41,16 +40,16 @@ func (ts *TaskService) CreateTask(ctx context.Context, title, description string
 	return t, nil
 }
 
-func (ts *TaskService) GetTasksByCreator(ctx context.Context, creatorID primitive.ObjectID) ([]*domains.Task, error) {
+func (ts *TaskUsecase) GetTasksByCreator(ctx context.Context, creatorID primitive.ObjectID) ([]*domains.Task, error) {
 	return ts.repo.FindTasksByCreator(ctx, creatorID)
 }
 
-func (ts *TaskService) GetTaskByIDAndCreator(ctx context.Context, taskID, creatorID primitive.ObjectID) (*domains.Task, error) {
+func (ts *TaskUsecase) GetTaskByIDAndCreator(ctx context.Context, taskID, creatorID primitive.ObjectID) (*domains.Task, error) {
 	return ts.repo.FindTaskByIDAndCreator(ctx, taskID, creatorID)
 }
 
 // Admin
-func (ts *TaskService) GetTaskByID(id string) (*domains.Task, error) {
+func (ts *TaskUsecase) GetTaskByID(id string) (*domains.Task, error) {
 	task, err := ts.repo.GetTaskByID(id)
 	if err != nil {
 		return nil, err
@@ -59,7 +58,7 @@ func (ts *TaskService) GetTaskByID(id string) (*domains.Task, error) {
 }
 
 // Admin
-func (ts *TaskService) GetAllTasks() ([]*domains.Task, error) {
+func (ts *TaskUsecase) GetAllTasks() ([]*domains.Task, error) {
 	tasks, err := ts.repo.GetAllTasks()
 	if err != nil {
 		return nil, err
@@ -67,7 +66,7 @@ func (ts *TaskService) GetAllTasks() ([]*domains.Task, error) {
 	return tasks, nil
 }
 
-func (ts *TaskService) UpdateTaskByCreatorID(ctx context.Context, taskID, creatorID primitive.ObjectID, title, description string, completed bool, dueDate time.Time) (*domains.Task, error) {
+func (ts *TaskUsecase) UpdateTaskByCreatorID(ctx context.Context, taskID, creatorID primitive.ObjectID, title, description string, completed bool, dueDate time.Time) (*domains.Task, error) {
 	task, err := ts.repo.FindTaskByIDAndCreator(ctx, taskID, creatorID)
 	if err != nil {
 		return nil, err
@@ -91,7 +90,7 @@ func (ts *TaskService) UpdateTaskByCreatorID(ctx context.Context, taskID, creato
 }
 
 // Admin
-func (ts *TaskService) UpdateTask(task *domains.Task) error {
+func (ts *TaskUsecase) UpdateTask(task *domains.Task) error {
 	existingTask, err := ts.repo.GetTaskByID(task.ID.Hex())
 	if err != nil {
 		return errors.New("couldn't find task")
@@ -102,7 +101,7 @@ func (ts *TaskService) UpdateTask(task *domains.Task) error {
 	return ts.repo.UpdateTask(task)
 }
 
-func (ts *TaskService) DeleteTaskByCreatorID(ctx context.Context, taskID, creatorID primitive.ObjectID) error {
+func (ts *TaskUsecase) DeleteTaskByCreatorID(ctx context.Context, taskID, creatorID primitive.ObjectID) error {
 	task, err := ts.repo.FindTaskByIDAndCreator(ctx, taskID, creatorID)
 	if err != nil {
 		return err
@@ -120,7 +119,7 @@ func (ts *TaskService) DeleteTaskByCreatorID(ctx context.Context, taskID, creato
 	return nil
 }
 
-func (ts *TaskService) DeleteTask(taskID string) error {
+func (ts *TaskUsecase) DeleteTask(taskID string) error {
 	existingTask, err := ts.repo.GetTaskByID(taskID)
 	if err != nil {
 		return errors.New("couldn't find task")
