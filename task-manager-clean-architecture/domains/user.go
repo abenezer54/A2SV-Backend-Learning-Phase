@@ -46,3 +46,8 @@ type UserRepository interface {
 	FindUserByUsername(ctx context.Context, username string) (*User, error)
 	UserExists(ctx context.Context, username string) (bool, error)
 }
+
+type UserUsecase interface {
+	RegisterUser(ctx context.Context, username, password, role string) (*User, error)
+	AuthenticateUser(ctx context.Context, username, password string) (*User, bool)
+}
