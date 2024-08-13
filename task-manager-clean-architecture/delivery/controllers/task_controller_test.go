@@ -3,6 +3,7 @@ package controllers
 import (
 	"bytes"
 	"encoding/json"
+	"errors"
 
 	"net/http"
 	"net/http/httptest"
@@ -181,6 +182,56 @@ func (suite *TaskControllerTestSuite) TestCreateTask_ValidationError() {
 	suite.router.ServeHTTP(w, req)
 
 	assert.Equal(suite.T(), http.StatusBadRequest, w.Code)
+}
+func (suite *TaskControllerTestSuite) TestDeleteTaskByCreatorID_NotFound() {
+	taskID := primitive.NewObjectID()
+
+	suite.mockUsecase.On("DeleteTaskByCreatorID", mock.Anything, taskID, mock.Anything).Return(mongo.ErrNoDocuments)
+
+	req, _ := http.NewRequest(http.MethodDelete, "/tasks/"+taskID.Hex(), nil)
+	w := httptest.NewRecorder()
+	suite.router.DELETE("/tasks/:id", suite.controller.DeleteTaskByCreatorID)
+	suite.router.ServeHTTP(w, req)
+
+	assert.Equal(suite.T(), http.StatusNotFound, w.Code)
+}
+
+func (suite *TaskControllerTestSuite) TestGetAllTasks_EmptyResult() {
+	creatorID, _ := primitive.ObjectIDFromHex(suite.userClaims.UserID)
+
+	suite.mockUsecase.On("GetTasksByCreator", mock.Anything, creatorID).Return([]*domains.Task{}, nil)
+
+	req, _ := http.NewRequest(http.MethodGet, "/tasks", nil)
+	w := httptest.NewRecorder()
+	suite.router.GET("/tasks", suite.controller.GetAllTasks)
+	suite.router.ServeHTTP(w, req)
+
+	assert.Equal(suite.T(), http.StatusOK, w.Code)
+	assert.JSONEq(suite.T(), "[]", w.Body.String())
+}
+
+func (suite *TaskControllerTestSuite) TestCreateTask_InternalServerError() {
+	reqBody := map[string]interface{}{
+		"title":       "Test Task",
+		"description": "This is a test task",
+		"status":      "pending",
+		"due_date":    time.Now(),
+	}
+	reqJSON, _ := json.Marshal(reqBody)
+
+	// Define a custom error to simulate internal server error
+	serverError := errors.New("server error")
+
+	// Mock the usecase to return the custom server error
+	suite.mockUsecase.On("CreateTask", mock.Anything, reqBody["title"], reqBody["description"], mock.Anything, mock.Anything).Return(nil, serverError)
+
+	req, _ := http.NewRequest(http.MethodPost, "/tasks", bytes.NewBuffer(reqJSON))
+	req.Header.Set("Content-Type", "application/json")
+	w := httptest.NewRecorder()
+	suite.router.POST("/tasks", suite.controller.CreateTask)
+	suite.router.ServeHTTP(w, req)
+
+	assert.Equal(suite.T(), http.StatusInternalServerError, w.Code)
 }
 
 func TestTaskControllerTestSuite(t *testing.T) {
