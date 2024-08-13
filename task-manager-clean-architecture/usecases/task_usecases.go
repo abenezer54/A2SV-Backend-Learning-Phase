@@ -47,23 +47,12 @@ func (ts *TaskUsecase) GetTasksByCreator(ctx context.Context, creatorID primitiv
 func (ts *TaskUsecase) GetTaskByIDAndCreator(ctx context.Context, taskID, creatorID primitive.ObjectID) (*domains.Task, error) {
 	return ts.repo.FindTaskByIDAndCreator(ctx, taskID, creatorID)
 }
-
-// Admin
-func (ts *TaskUsecase) GetTaskByID(id string) (*domains.Task, error) {
+func (ts *TaskUsecase) GetTaskByID(ctx context.Context, id string) (*domains.Task, error) {
 	task, err := ts.repo.GetTaskByID(id)
 	if err != nil {
 		return nil, err
 	}
 	return task, nil
-}
-
-// Admin
-func (ts *TaskUsecase) GetAllTasks() ([]*domains.Task, error) {
-	tasks, err := ts.repo.GetAllTasks()
-	if err != nil {
-		return nil, err
-	}
-	return tasks, nil
 }
 
 func (ts *TaskUsecase) UpdateTaskByCreatorID(ctx context.Context, taskID, creatorID primitive.ObjectID, title, description string, completed bool, dueDate time.Time) (*domains.Task, error) {
@@ -89,18 +78,6 @@ func (ts *TaskUsecase) UpdateTaskByCreatorID(ctx context.Context, taskID, creato
 	return task, nil
 }
 
-// Admin
-func (ts *TaskUsecase) UpdateTask(task *domains.Task) error {
-	existingTask, err := ts.repo.GetTaskByID(task.ID.Hex())
-	if err != nil {
-		return errors.New("couldn't find task")
-	}
-	if existingTask == nil {
-		return errors.New("task not found")
-	}
-	return ts.repo.UpdateTask(task)
-}
-
 func (ts *TaskUsecase) DeleteTaskByCreatorID(ctx context.Context, taskID, creatorID primitive.ObjectID) error {
 	task, err := ts.repo.FindTaskByIDAndCreator(ctx, taskID, creatorID)
 	if err != nil {
@@ -117,15 +94,4 @@ func (ts *TaskUsecase) DeleteTaskByCreatorID(ctx context.Context, taskID, creato
 	}
 
 	return nil
-}
-
-func (ts *TaskUsecase) DeleteTask(taskID string) error {
-	existingTask, err := ts.repo.GetTaskByID(taskID)
-	if err != nil {
-		return errors.New("couldn't find task")
-	}
-	if existingTask == nil {
-		return errors.New("task not found")
-	}
-	return ts.repo.DeleteTask(taskID)
 }
