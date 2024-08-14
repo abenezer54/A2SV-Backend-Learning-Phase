@@ -76,6 +76,8 @@ func (r *TaskRepoMongo) GetTaskByID(id string) (*domains.Task, error) {
 
 	if err == mongo.ErrNoDocuments {
 		return nil, fmt.Errorf("task not found")
+	} else if err != nil {
+		return nil, err
 	}
 	return &task, err
 }
