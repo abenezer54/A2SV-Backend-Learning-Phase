@@ -41,7 +41,10 @@ func (uc *UserController) Register(c *gin.Context) {
 		return
 	}
 
-	c.JSON(http.StatusOK, user)
+	c.JSON(http.StatusOK, gin.H{
+		"username": user.Username,
+		"role":     user.Role,
+	})
 }
 
 // Login handles user login
