@@ -32,11 +32,8 @@ type TaskRepository interface {
 	FindTasksByCreator(ctx context.Context, creatorID primitive.ObjectID) ([]*Task, error)
 	FindTaskByIDAndCreator(ctx context.Context, taskID, creatorID primitive.ObjectID) (*Task, error)
 	GetTaskByID(id string) (*Task, error)
-	GetAllTasks() ([]*Task, error)
 	UpdateTaskByCreatorID(ctx context.Context, task *Task) error
-	UpdateTask(task *Task) error
 	DeleteTaskByCreatorID(ctx context.Context, taskID, creatorID primitive.ObjectID) error
-	DeleteTask(id string) error
 }
 
 type TaskUsecase interface {

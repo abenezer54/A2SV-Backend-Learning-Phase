@@ -8,6 +8,7 @@ import (
 	"task-manager-api/infrastructure"
 	"task-manager-api/repositories"
 	"task-manager-api/usecases"
+	mongo_c "task-manager-api/infrastructure/mongo_custom"
 
 	"github.com/joho/godotenv"
 )
@@ -17,8 +18,8 @@ func main() {
 	infrastructure.ConnectDB()
 	dbClient := infrastructure.GetDB()
 
-	taskCollection := dbClient.Database("task-manager").Collection("tasks")
-	userCollection := dbClient.Database("task-manager").Collection("users")
+	taskCollection := mongo_c.NewMongoCollection(dbClient.Database("task-manager").Collection("tasks"))
+	userCollection := mongo_c.NewMongoCollection(dbClient.Database("task-manager").Collection("users"))
 
 	taskRepo := repositories.NewTaskRepositoryMongo(taskCollection)
 	userRepo := repositories.NewUserRepositoryMongo(userCollection)

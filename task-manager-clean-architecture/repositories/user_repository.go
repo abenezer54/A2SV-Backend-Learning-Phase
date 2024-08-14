@@ -4,16 +4,15 @@ import (
 	"context"
 
 	"task-manager-api/domains"
-
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/mongo"
 )
 
 type UserRepositoryMongo struct {
-	collection *mongo.Collection
+	collection domains.CollectionInteface
 }
 
-func NewUserRepositoryMongo(collection *mongo.Collection) *UserRepositoryMongo {
+func NewUserRepositoryMongo(collection domains.CollectionInteface) *UserRepositoryMongo {
 	return &UserRepositoryMongo{
 		collection: collection,
 	}

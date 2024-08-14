@@ -12,10 +12,10 @@ import (
 )
 
 type TaskRepoMongo struct {
-	collection *mongo.Collection
+	collection domains.CollectionInteface
 }
 
-func NewTaskRepositoryMongo(collection *mongo.Collection) *TaskRepoMongo {
+func NewTaskRepositoryMongo(collection domains.CollectionInteface) *TaskRepoMongo {
 	return &TaskRepoMongo{
 		collection: collection,
 	}
@@ -80,27 +80,6 @@ func (r *TaskRepoMongo) GetTaskByID(id string) (*domains.Task, error) {
 	return &task, err
 }
 
-func (r *TaskRepoMongo) GetAllTasks() ([]*domains.Task, error) {
-	cursor, err := r.collection.Find(context.TODO(), bson.D{})
-	if err != nil {
-		return nil, err
-	}
-	defer cursor.Close(context.TODO())
-
-	var tasks []*domains.Task
-	for cursor.Next(context.TODO()) {
-		var task domains.Task
-		if err = cursor.Decode(&task); err != nil {
-			return nil, err
-		}
-		tasks = append(tasks, &task)
-	}
-	if err = cursor.Err(); err != nil {
-		return nil, err
-	}
-	return tasks, nil
-}
-
 func (r *TaskRepoMongo) UpdateTaskByCreatorID(ctx context.Context, task *domains.Task) error {
 	filter := bson.M{"_id": task.ID, "creator_id": task.CreatorID}
 	update := bson.M{
@@ -115,27 +94,8 @@ func (r *TaskRepoMongo) UpdateTaskByCreatorID(ctx context.Context, task *domains
 	return err
 }
 
-// Admin
-func (r *TaskRepoMongo) UpdateTask(task *domains.Task) error {
-	_, err := r.collection.UpdateOne(
-		context.TODO(),
-		bson.M{"_id": task.ID},
-		bson.M{"$set": task},
-	)
-	return err
-}
-
 func (r *TaskRepoMongo) DeleteTaskByCreatorID(ctx context.Context, taskID, creatorID primitive.ObjectID) error {
 	filter := bson.M{"_id": taskID, "creator_id": creatorID}
 	_, err := r.collection.DeleteOne(ctx, filter)
-	return err
-}
-
-func (r *TaskRepoMongo) DeleteTask(id string) error {
-	objID, err := primitive.ObjectIDFromHex(id)
-	if err != nil {
-		return err
-	}
-	_, err = r.collection.DeleteOne(context.TODO(), bson.M{"_id": objID})
 	return err
 }
