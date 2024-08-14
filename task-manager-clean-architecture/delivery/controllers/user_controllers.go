@@ -3,17 +3,17 @@ package controllers
 import (
 	"net/http"
 
+	"task-manager-api/domains"
 	"task-manager-api/infrastructure"
-	"task-manager-api/usecases"
 
 	"github.com/gin-gonic/gin"
 )
 
 type UserController struct {
-	userUsecase *usecases.UserUsecase
+	userUsecase domains.UserUsecase
 }
 
-func NewUserController(userUsecase *usecases.UserUsecase) *UserController {
+func NewUserController(userUsecase domains.UserUsecase) *UserController {
 	return &UserController{
 		userUsecase: userUsecase,
 	}
